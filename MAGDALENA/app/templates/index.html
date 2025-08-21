@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Predicciones — Regresión Lineal</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      body { padding-top: 24px; }
+      .card { border-radius: 1rem; }
+      .form-label { font-weight: 600; }
+    </style>
+  </head>
+  <body class="bg-light">
+    <div class="container">
+      <h1 class="mb-4">Predicción de Precio (S/)</h1>
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <div class="mb-3">
+          {% for category, message in messages %}
+            <div class="alert alert-{{ category }} mb-2" role="alert">
+              {{ message }}
+            </div>
+          {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+
+      <div class="row g-4">
+        <!-- Formulario de 1 registro -->
+        <div class="col-12 col-lg-6">
+          <div class="card shadow-sm">
+            <div class="card-body">
+              <h5 class="card-title mb-3">Formulario (1 registro)</h5>
+              <form action="{{ url_for('predict_single') }}" method="post" class="row g-3">
+                {% for col in features %}
+                  <div class="col-12 col-md-6">
+                    <label class="form-label" for="f_{{ loop.index }}">{{ col }}</label>
+                    <input
+                      type="number"
+                      step="any"
+                      class="form-control"
+                      id="f_{{ loop.index }}"
+                      name="{{ col }}"
+                      placeholder="Ingresa {{ col }}"
+                    />
+                  </div>
+                {% endfor %}
+                <div class="col-12">
+                  <button class="btn btn-primary" type="submit">Predecir</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <!-- Carga de archivo -->
+        <div class="col-12 col-lg-6">
+          <div class="card shadow-sm">
+            <div class="card-body">
+              <h5 class="card-title mb-3">Subir archivo (Excel/CSV)</h5>
+              <p class="text-muted">
+                El archivo debe contener estas columnas (en cualquier orden):<br>
+                <code>{{ features|join(', ') }}</code>
+              </p>
+              <form action="{{ url_for('predict_file') }}" method="post" enctype="multipart/form-data" class="row g-3">
+                <div class="col-12">
+                  <input class="form-control" type="file" name="file" accept=".xlsx,.xls,.csv" />
+                </div>
+                <div class="col-12">
+                  <button class="btn btn-success" type="submit">Procesar y descargar predicciones</button>
+                </div>
+              </form>
+              <hr>
+              <small class="text-muted">
+                Consejo: si tu archivo tiene <code>Distrito</code> o <code>Vista al exterior</code>, se ignorarán.
+                Si trae la columna target <code>Precio en soles corrientes</code>, también se ignora para predecir.
+              </small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>
+
